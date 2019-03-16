@@ -12,9 +12,12 @@ from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 from requests.exceptions import RequestException
 
+import bei_ke_db
+import log
+
 ua = UserAgent(use_cache_server=False)
 # 日志配置
-handler = logging.FileHandler(filename='bei_ke.log', encoding='utf-8')
+handler = logging.FileHandler(filename='bei_ke_used.log', encoding='utf-8')
 stream_handler = logging.StreamHandler(sys.stdout)
 stream_handler.setLevel(level=logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s -|- %(levelname)s -|- %(message)s')
@@ -134,7 +137,7 @@ def deal_house_detail(soup):
         for (i, li) in enumerate(sell_list):
             try:
                 time.sleep(3)
-                detail_href = li.find('a')['href']  # 详情页面链接
+                detail_href = li.find('a')['href']  # 详情页面链接  s
                 print('访问详情页面：' + detail_href + ' - ' +
                       str("{:.2f}".format(i/sell_num*100)) + ' %')
                 response_detail = requests.get(
@@ -142,55 +145,57 @@ def deal_house_detail(soup):
                 if response_detail.status_code == 200:
                     soup_detail = BeautifulSoup(
                         response_detail.text, 'html5lib')
-                    describe = soup_detail.find('h1', class_="main")  # 标题 - 描述
+                    describe = soup_detail.find(
+                        'h1', class_="main").string  # 标题 - 描述  s
 
-                    img_house_layout = None   # 户型图
-                    img_house_other = []   # 房源照片
+                    img_house_layout = None   # 户型图  s
+                    img_house_other = []   # 房源照片  s
                     img_dom = soup_detail.find('ul', class_="smallpic")
                     if img_dom:
                         for li in img_dom.select('li'):
                             if li['data-desc'] == '户型图':
-                                img_house_layout = li['data-pic']
+                                img_house_layout = json.dumps(li['data-pic'])
                             else:
                                 img_house_other.append(li['data-pic'])
                     else:
                         print('当前房源没有图片')
+                    img_house_other = json.dumps(img_house_other)
 
                     price_dom = soup_detail.find('div', class_="price")
                     total_price_value = int(price_dom.find(
-                        'span', class_="total").string)  # 总价
+                        'span', class_="total").string)  # 总价  s
                     total_price_unit = price_dom.find(
-                        'span', class_="unit").span.string  # 总价单位
+                        'span', class_="unit").span.string  # 总价单位  s
                     unit_price_value = float(price_dom.find(
-                        'span', class_="unitPriceValue").string)  # 均价
+                        'span', class_="unitPriceValue").string)  # 均价  s
                     unit_price_unit = price_dom.find(
-                        'div', class_="unitPrice").i.string  # 均价单位
+                        'div', class_="unitPrice").i.string  # 均价单位  s
 
                     community_dom = soup_detail.find(
                         'div', class_="aroundInfo")
                     community_info_dom = community_dom.find(
                         'div', class_="communityName").find('a', class_="info")
-                    community_href = community_info_dom['href']   # 小区链接
+                    community_href = community_info_dom['href']   # 小区链接  s
                     community_number = re.match(
-                        re_community_number, community_href).groups()[0]   # 小区编号
+                        re_community_number, community_href).groups()[0]   # 小区编号  s
                     community_area_info_dom = community_dom.find(
                         'div', class_="areaName").find('span', class_="info")
-                    # 小区所在区
+                    # 小区所在区  s
                     community_zone = community_area_info_dom.contents[0].string
-                    # 小区所在商圈
+                    # 小区所在商圈  s
                     community_business_zone = community_area_info_dom.contents[1].string
 
                     house_number_dom = community_dom.find(
                         'div', class_="houseRecord").find('span', class_="info")
                     house_number_dom.span.extract()
-                    house_number = house_number_dom.get_text().strip()   # 房子的贝壳编码
+                    house_number = house_number_dom.get_text().strip()   # 房子的贝壳编码  s
 
                     house_info_dom = soup_detail.find(
                         'div', class_="houseInfo")
                     build_year_string = house_info_dom.find(
                         'div', class_="area").find('div', class_="subInfo").string
                     build_year_re = re.match(re_build_year, build_year_string)
-                    build_year = None  # 建造年代
+                    build_year = None  # 建造年代  s
                     if build_year_re:
                         build_year = int(build_year_re.groups(1)[0])
 
@@ -199,21 +204,21 @@ def deal_house_detail(soup):
 
                     base_intro = intro_content_dom.find(
                         'div', class_="base").find_all('li')
-                    house_type_room = None  # 室
-                    house_type_living = None  # 厅
-                    house_type_bathroom = None  # 卫
-                    floor_position = None   # 楼层位置
-                    floor_sum = None   # 总楼层
-                    house_area = None  # 总面积
-                    family_structure = None   # 户型结构
-                    building_types = None   # 建筑类型
-                    house_toward = None   # 房屋朝向
-                    building_structure = None   # 建筑结构
-                    repair_situation = None   # 装修情况
-                    ladder_household_proportion = None   # 梯户比例
-                    equipped_elevator = None   # 配备电梯
-                    villa_type = None   # 别墅类型
-                    property_right_years = None   # 产权年限
+                    house_type_room = None  # 室  s
+                    house_type_living = None  # 厅  s
+                    house_type_bathroom = None  # 卫  s
+                    floor_position = None   # 楼层位置  s
+                    floor_sum = None   # 总楼层  s
+                    house_area = None  # 总面积  s
+                    family_structure = None   # 户型结构  s
+                    building_types = None   # 建筑类型  s
+                    house_toward = None   # 房屋朝向  s
+                    building_structure = None   # 建筑结构  s
+                    repair_situation = None   # 装修情况  s
+                    ladder_household_proportion = None   # 梯户比例  s
+                    equipped_elevator = None   # 配备电梯  s
+                    villa_type = None   # 别墅类型  s
+                    property_right_years = None   # 产权年限  s
                     for li in base_intro:
                         label = li.contents[0].string
                         content = li.contents[1].string
@@ -259,14 +264,14 @@ def deal_house_detail(soup):
 
                     transaction_intro = intro_content_dom.find(
                         'div', class_="transaction").find_all('li')
-                    listing_time = None   # 挂牌时间
-                    trading_authority = None   # 交易权属
-                    last_transaction = None   # 上次交易
-                    housing_use = None   # 房屋用途
-                    housing_life = None   # 房屋年限
-                    property_ownership = None   # 产权所属
-                    mortgage_information = None   # 抵押信息
-                    housing_spare_parts = None   # 房本备件
+                    listing_time = None   # 挂牌时间  s
+                    trading_authority = None   # 交易权属  s
+                    last_transaction = None   # 上次交易  s
+                    housing_use = None   # 房屋用途  s
+                    housing_life = None   # 房屋年限  s
+                    property_ownership = None   # 产权所属  s
+                    mortgage_information = None   # 抵押信息  s
+                    housing_spare_parts = None   # 房本备件  s
                     for li in transaction_intro:
                         label = li.contents[0].string
                         content = li.contents[1].string
@@ -294,6 +299,16 @@ def deal_house_detail(soup):
                         else:
                             logger.info(
                                 '卍卍卍卍卍卍卍卍 【交易信息】 没有写入的属性：%s 卐卐卐卐卐卐卐卐', label)
+
+                    bei_ke_db.write_used_db(house_number, detail_href, describe,
+                                            total_price_value, total_price_unit, unit_price_value, unit_price_unit,
+                                            community_href, community_number, community_zone, community_business_zone,
+                                            build_year, house_type_room, house_type_living, house_type_bathroom,
+                                            floor_position, floor_sum, house_area, family_structure, building_types,
+                                            house_toward, building_structure, repair_situation, ladder_household_proportion,
+                                            equipped_elevator, villa_type, property_right_years, listing_time, trading_authority,
+                                            last_transaction, housing_use, housing_life, property_ownership, mortgage_information,
+                                            housing_spare_parts, img_house_layout, img_house_other,)
                 else:
                     logger.info('详情页请求失败 地址：%s， 状态码：%s', detail_href,
                                 response_detail.status_code)
