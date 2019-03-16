@@ -161,7 +161,7 @@ def deal_house_detail(soup):
                     img_house_other = json.dumps(img_house_other)
 
                     price_dom = soup_detail.find('div', class_="price")
-                    total_price_value = int(price_dom.find(
+                    total_price_value = float(price_dom.find(
                         'span', class_="total").string)  # 总价  s
                     total_price_unit = price_dom.find(
                         'span', class_="unit").span.string  # 总价单位  s

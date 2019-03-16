@@ -1,4 +1,4 @@
--- auto-generated definition
+
 create table bei_ke_house_used
 (
     id integer not null,
@@ -9,7 +9,7 @@ create table bei_ke_house_used
     --详情页面链接
     describe text,
     --标题 - 描述
-    total_price_value int default none not null,
+    total_price_value float,
     --总价
     total_price_unit varchar(100),
     --总价单位
@@ -17,6 +17,10 @@ create table bei_ke_house_used
     -- 均价
     unit_price_unit varchar(10),
     --均价单位
+    img_layout text,
+    --户型图
+    img_other text,
+    --房源照片
     community_href varchar(100),
     --小区链接
     community_number varchar(100),
@@ -71,12 +75,8 @@ create table bei_ke_house_used
     --产权所属
     mortgage_information varchar(30),
     --抵押信息
-    housing_spare_parts varchar(30),
+    housing_spare_parts varchar(30)
     --房本备件
-    img_layout text,
-    --户型图
-    img_other text,
-    --房源照片
 );
 
 create unique index bei_ke_house_used_id_uindex
@@ -84,7 +84,5 @@ create unique index bei_ke_house_used_id_uindex
 
 create unique index bei_ke_house_used_number_uindex
   on bei_ke_house_used (number);
-
--- unexpected locus for key
 ;
 

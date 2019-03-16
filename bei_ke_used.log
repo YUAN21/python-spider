@@ -5,3 +5,8 @@ Traceback (most recent call last):
   File "g:\codingSomething\python爬虫\bei_ke_used.py", line 110, in deal_house_list
     url_other_page = host + zone_href + '/' + 'pg' + page_num + '/'
 TypeError: must be str, not int
+2019-03-16 21:42:12,341 -|- ERROR -|- 详情页解析错误：https://zj.ke.com/ershoufang/18101914610100106158.html
+Traceback (most recent call last):
+  File "g:\codingSomething\python爬虫\bei_ke_used.py", line 165, in deal_house_detail
+    'span', class_="total").string)  # 总价  s
+ValueError: invalid literal for int() with base 10: '58.8'
