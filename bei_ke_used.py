@@ -72,7 +72,7 @@ def print_schedule(curr_value, total_value):
     if total_value == 0:
         total_value = 1
     print('处理第 ' + str(curr_value) + ' 页中 - ' +
-          "{:.2f}".format(1/total_value*100) + " %")
+          "{:.2f}".format(curr_value/total_value*100) + " %")
 
 
 def deal_house_list(host, zone_name, zone_href):
@@ -138,7 +138,7 @@ def deal_house_detail(soup):
                 time.sleep(3)
                 detail_href = li.find('a')['href']  # 详情页面链接  s
                 print('访问详情页面：' + detail_href + ' - ' +
-                      str("{:.2f}".format(i/sell_num*100)) + ' %')
+                      str("{:.2f}".format((i + 1)/sell_num*100)) + ' %')
                 response_detail = requests.get(
                     detail_href, headers=headers, timeout=7)
                 if response_detail.status_code == 200:
@@ -180,9 +180,9 @@ def deal_house_detail(soup):
                     community_area_info_dom = community_dom.find(
                         'div', class_="areaName").find('span', class_="info")
                     # 小区所在区  s
-                    community_zone = community_area_info_dom.contents[0].string
+                    community_zone = community_area_info_dom.contents[2].string
                     # 小区所在商圈  s
-                    community_business_zone = community_area_info_dom.contents[1].string
+                    community_business_zone = community_area_info_dom.contents[3].string
 
                     house_number_dom = community_dom.find(
                         'div', class_="houseRecord").find('span', class_="info")

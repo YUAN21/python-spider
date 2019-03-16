@@ -1,12 +1,15 @@
-2019-03-16 21:34:13,063 -|- ERROR -|- Ready解析失败
+
+2019-03-16 21:58:30,524 -|- ERROR -|- 详情页解析错误：https://zj.ke.com/ershoufang/18111214610100100816.html
 Traceback (most recent call last):
-  File "g:\codingSomething\python爬虫\bei_ke_used.py", line 61, in prepare
-    deal_house_list(host, name, href)
-  File "g:\codingSomething\python爬虫\bei_ke_used.py", line 110, in deal_house_list
-    url_other_page = host + zone_href + '/' + 'pg' + page_num + '/'
-TypeError: must be str, not int
-2019-03-16 21:42:12,341 -|- ERROR -|- 详情页解析错误：https://zj.ke.com/ershoufang/18101914610100106158.html
+  File "g:\codingSomething\python爬虫\bei_ke_used.py", line 310, in deal_house_detail
+    housing_spare_parts, img_house_layout, img_house_other,)
+  File "g:\codingSomething\python爬虫\bei_ke_db.py", line 71, in write_used_db
+    insert_params + ') VALUES(' + values + ')', data)
+sqlite3.IntegrityError: NOT NULL constraint failed: bei_ke_house_used.id
+2019-03-16 21:58:35,054 -|- ERROR -|- 详情页解析错误：https://zj.ke.com/ershoufang/19021414610100102412.html
 Traceback (most recent call last):
-  File "g:\codingSomething\python爬虫\bei_ke_used.py", line 165, in deal_house_detail
-    'span', class_="total").string)  # 总价  s
-ValueError: invalid literal for int() with base 10: '58.8'
+  File "g:\codingSomething\python爬虫\bei_ke_used.py", line 310, in deal_house_detail
+    housing_spare_parts, img_house_layout, img_house_other,)
+  File "g:\codingSomething\python爬虫\bei_ke_db.py", line 71, in write_used_db
+    insert_params + ') VALUES(' + values + ')', data)
+sqlite3.IntegrityError: NOT NULL constraint failed: bei_ke_house_used.id

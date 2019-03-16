@@ -76,4 +76,4 @@ def write_used_db(house_number, detail_href, describe,
         cursor.close()
         conn_db.commit()
     except Exception:
-        pass
+        print(Exception)
