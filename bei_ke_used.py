@@ -180,7 +180,7 @@ def deal_house_detail(soup):
                     community_area_info_dom = community_dom.find(
                         'div', class_="areaName").find('span', class_="info")
                     # 小区所在区  s
-                    community_zone = community_area_info_dom.contents[2].string
+                    community_zone = community_area_info_dom.contents[1].string
                     # 小区所在商圈  s
                     community_business_zone = community_area_info_dom.contents[3].string
 

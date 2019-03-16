@@ -47,6 +47,7 @@ def write_used_db(house_number, detail_href, describe,
         property_ownership, mortgage_information, housing_spare_parts
         '''
     values = '?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?'
+    total_price_unit = '23333'
     data = (
         house_number, detail_href, describe,
         total_price_value, total_price_unit, unit_price_value, unit_price_unit, img_house_layout, img_house_other,
@@ -71,7 +72,7 @@ def write_used_db(house_number, detail_href, describe,
                            insert_params + ') VALUES(' + values + ')', data)
         else:
             cursor.execute('UPDATE bei_ke_house_used SET ' +
-                           update_params + ' WHERE number = ' + house_number, data)
+                           update_params + ' WHERE number = ' + "'" + house_number + "'", data)
 
         cursor.close()
         conn_db.commit()
