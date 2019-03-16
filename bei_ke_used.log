@@ -1,0 +1,7 @@
+2019-03-16 21:34:13,063 -|- ERROR -|- Ready解析失败
+Traceback (most recent call last):
+  File "g:\codingSomething\python爬虫\bei_ke_used.py", line 61, in prepare
+    deal_house_list(host, name, href)
+  File "g:\codingSomething\python爬虫\bei_ke_used.py", line 110, in deal_house_list
+    url_other_page = host + zone_href + '/' + 'pg' + page_num + '/'
+TypeError: must be str, not int

@@ -107,7 +107,7 @@ def deal_house_list(host, zone_name, zone_href):
                 for page_num in range(2, max_page + 1):
                     print_schedule(page_num, max_page)
                     time.sleep(random.randint(3, 7))
-                    url_other_page = host + zone_href + '/' + 'pg' + page_num + '/'
+                    url_other_page = host + zone_href + '/' + 'pg' + str(page_num) + '/'
                     response_other_page = requests.get(
                         url_other_page, headers=headers, timeout=7)
                     if response_other_page.status_code == 200:
@@ -273,7 +273,7 @@ def deal_house_detail(soup):
                     housing_spare_parts = None   # 房本备件  s
                     for li in transaction_intro:
                         label = li.contents[0].string
-                        content = li.contents[1].string
+                        content = li.contents[1].string.strip()
                         if content == '暂无数据':
                             continue
                         if label == '挂牌时间':
