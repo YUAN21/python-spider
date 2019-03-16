@@ -145,7 +145,7 @@ def deal_house_detail(soup):
                     soup_detail = BeautifulSoup(
                         response_detail.text, 'html5lib')
                     describe = soup_detail.find(
-                        'h1', class_="main").string  # 标题 - 描述  s
+                        'h1', class_="main").string.strip()  # 标题 - 描述  s
 
                     img_house_layout = None   # 户型图  s
                     img_house_other = []   # 房源照片  s
