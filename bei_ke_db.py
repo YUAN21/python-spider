@@ -47,7 +47,6 @@ def write_used_db(house_number, detail_href, describe,
         property_ownership, mortgage_information, housing_spare_parts
         '''
     values = '?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?'
-    total_price_unit = '23333'
     data = (
         house_number, detail_href, describe,
         total_price_value, total_price_unit, unit_price_value, unit_price_unit, img_house_layout, img_house_other,
