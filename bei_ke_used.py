@@ -13,7 +13,6 @@ from fake_useragent import UserAgent
 from requests.exceptions import RequestException
 
 import bei_ke_db
-import log
 
 ua = UserAgent(use_cache_server=False)
 # 日志配置
