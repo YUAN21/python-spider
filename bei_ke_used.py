@@ -41,8 +41,12 @@ re_listing_time = re.compile('(\d+)年(\d+)月(\d+)日')
 
 host = 'https://zj.ke.com'
 
+begain_zone = None
+begain_page_num = None
+
 
 def prepare(host):
+
     ready_url = host + '/ershoufang/'
     ready_response = requests.get(
         ready_url, timeout=7
@@ -58,7 +62,11 @@ def prepare(host):
                 zone_options[a.string] = a['href']
             for (name, href) in zone_options.items():
                 print('当前处理：' + name)
-                deal_house_list(host, name, href)
+                global begain_zone
+                if not begain_zone or name == begain_zone:
+                    deal_house_list(host, name, href)
+                    if begain_zone:
+                        begain_zone = None
 
         except Exception:
             logger.exception('Ready解析失败')
@@ -76,6 +84,7 @@ def print_schedule(curr_value, total_value):
 
 
 def deal_house_list(host, zone_name, zone_href):
+
     headers = {
         'User-Agent':  ua.random,
         'Accept-Encoding': 'gzip, deflate, sdch',
@@ -98,25 +107,34 @@ def deal_house_list(host, zone_name, zone_href):
                 max_page = int(json.loads(page_data)['totalPage'])
 
             print('共 ' + str(max_page) + ' 页')
-            # 处理第一页
-            print_schedule(1, max_page)
-            deal_house_detail(soup)
+            global begain_page_num
+            if not begain_page_num or begain_page_num == 1:
+                # 处理第一页
+                print_schedule(1, max_page)
+                deal_house_detail(soup)
+                if begain_page_num:
+                    begain_page_num = None
 
             # 处理其他页
             if max_page > 1:
                 for page_num in range(2, max_page + 1):
-                    print_schedule(page_num, max_page)
-                    time.sleep(random.randint(3, 7))
-                    url_other_page = host + zone_href + '/' + 'pg' + str(page_num) + '/'
-                    response_other_page = requests.get(
-                        url_other_page, headers=headers, timeout=7)
-                    if response_other_page.status_code == 200:
-                        soup_other_page = BeautifulSoup(
-                            response_other_page.text, 'html5lib')
-                        deal_house_detail(soup_other_page)
-                    else:
-                        logger.warning(
-                            '列表请求失败 地址：%s， 状态码：%s', url_other_page, response_other_page.status_code)
+                    if not begain_page_num or page_num == begain_page_num:
+                        print(zone_name + '：共' + str(max_page) + ' 页')
+                        print_schedule(page_num, max_page)
+                        time.sleep(random.randint(3, 7))
+                        url_other_page = host + zone_href + \
+                            '/' + 'pg' + str(page_num) + '/'
+                        response_other_page = requests.get(
+                            url_other_page, headers=headers, timeout=7)
+                        if response_other_page.status_code == 200:
+                            soup_other_page = BeautifulSoup(
+                                response_other_page.text, 'html5lib')
+                            deal_house_detail(soup_other_page)
+                        else:
+                            logger.warning(
+                                '列表请求失败 地址：%s， 状态码：%s', url_other_page, response_other_page.status_code)
+                        if begain_page_num:
+                            begain_page_num = None
         else:
             logger.warning('列表首页请求失败 地址：%s， 状态码：%s', url, response.status_code)
     except RequestException:
@@ -149,15 +167,19 @@ def deal_house_detail(soup):
 
                     img_house_layout = None   # 户型图  s
                     img_house_other = []   # 房源照片  s
+
                     img_dom = soup_detail.find('ul', class_="smallpic")
                     if img_dom:
                         for li in img_dom.select('li'):
-                            if li['data-desc'] == '户型图':
-                                img_house_layout = json.dumps(li['data-pic'])
-                            else:
-                                img_house_other.append(li['data-pic'])
-                    else:
-                        print('当前房源没有图片')
+                            try:
+                                if li['data-desc'] == '户型图':
+                                    img_house_layout = json.dumps(
+                                        li['data-pic'])
+                                else:
+                                    img_house_other.append(li['data-pic'])
+                            except Exception:
+                                print('没有图片')
+
                     img_house_other = json.dumps(img_house_other)
 
                     price_dom = soup_detail.find('div', class_="price")
@@ -230,10 +252,13 @@ def deal_house_detail(soup):
                             house_type_living = int(house_type_re[1])
                             house_type_bathroom = int(house_type_re[2])
                         elif label == '所在楼层':
-                            floor = re.match(
+                            try:
+                                floor = re.match(
                                 re_floor_position, content).groups()
-                            floor_position = floor[0]
-                            floor_sum = int(floor[1])
+                                floor_position = floor[0]
+                                floor_sum = int(floor[1])
+                            except:
+                                print('楼层信息缺失')
                         elif label == '建筑面积':
                             area = re.match(re_houser_area, content).groups()
                             house_area = float(area[0])
@@ -315,6 +340,10 @@ def deal_house_detail(soup):
                 logger.exception('详情页解析错误：%s', detail_href)
     else:
         print('当前页没有数据')
+
+
+def test():
+    pass
 
 
 def main():

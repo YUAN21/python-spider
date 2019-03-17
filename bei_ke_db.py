@@ -1,5 +1,5 @@
 import sqlite3
-
+import time
 
 def test_db():
     conn_db = sqlite3.connect('SQLite.db')
@@ -25,7 +25,7 @@ def write_used_db(house_number, detail_href, describe,
                   equipped_elevator, villa_type, property_right_years, listing_time, trading_authority,
                   last_transaction, housing_use, housing_life, property_ownership, mortgage_information,
                   housing_spare_parts, img_house_layout, img_house_other):   # 37
-
+    create_time = int(time.time())
     update_params = '''
         number = ?,href = ?, describe = ?, total_price_value = ?,
         total_price_unit = ?, unit_price_value = ?, unit_price_unit = ?, img_layout = ?, img_other = ?, community_href = ?, 
@@ -34,7 +34,7 @@ def write_used_db(house_number, detail_href, describe,
         family_structure = ?, building_types = ?, toward = ?, building_structure = ?, repair = ?, 
         ladder_household_proportion = ?, equipped_elevator = ?, villa_type = ?, property_right_years = ?, 
         listing_time = ?, trading_authority = ?, last_transaction = ?, housing_use = ?, housing_life = ?, 
-        property_ownership = ?, mortgage_information = ?, housing_spare_parts = ?
+        property_ownership = ?, mortgage_information = ?, housing_spare_parts = ?,create_time = ?
         '''
     insert_params = '''
         number,href, describe, total_price_value,
@@ -44,9 +44,9 @@ def write_used_db(house_number, detail_href, describe,
         family_structure, building_types, toward, building_structure, repair, 
         ladder_household_proportion, equipped_elevator, villa_type, property_right_years, 
         listing_time, trading_authority, last_transaction, housing_use, housing_life, 
-        property_ownership, mortgage_information, housing_spare_parts
+        property_ownership, mortgage_information, housing_spare_parts, create_time
         '''
-    values = '?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?'
+    values = '?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?'
     data = (
         house_number, detail_href, describe,
         total_price_value, total_price_unit, unit_price_value, unit_price_unit, img_house_layout, img_house_other,
@@ -56,7 +56,7 @@ def write_used_db(house_number, detail_href, describe,
         house_toward, building_structure, repair_situation, ladder_household_proportion,
         equipped_elevator, villa_type, property_right_years, listing_time, trading_authority,
         last_transaction, housing_use, housing_life, property_ownership, mortgage_information,
-        housing_spare_parts
+        housing_spare_parts, create_time
     )
 
     try:

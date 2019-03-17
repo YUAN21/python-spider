@@ -75,8 +75,10 @@ create table bei_ke_house_used
     --产权所属
     mortgage_information varchar(30),
     --抵押信息
-    housing_spare_parts varchar(30)
+    housing_spare_parts varchar(30),
     --房本备件
+    create_time integer
+    --抓取时间s
 );
 
 create unique index bei_ke_house_used_id_uindex
