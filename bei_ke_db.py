@@ -77,3 +77,10 @@ def write_used_db(house_number, detail_href, describe,
         conn_db.commit()
     except Exception:
         print(Exception)
+
+def delete_outdated_msg(time):
+    conn_db = sqlite3.connect('SQLite.db')
+    cursor = conn_db.cursor()  # 游标
+    cursor.execute('DELETE FROM bei_ke_house_used WHERE create_time == ' + str(time))
+    cursor.close()
+    conn_db.commit()
