@@ -387,7 +387,7 @@ def deal_house_detail(soup):
                 print('访问详情页面：' + detail_href + ' - ' +
                       str("{:.2f}".format((i + 1)/sell_num*100)) + ' %')
                 response_detail = requests.get(
-                    detail_href, headers=headers, timeout=.1)
+                    detail_href, headers=headers, timeout=7)
                 if response_detail.status_code == 200:
                     soup_detail = BeautifulSoup(
                         response_detail.text, 'html5lib')
