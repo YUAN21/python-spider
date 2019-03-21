@@ -47,14 +47,29 @@ begain_page_num = None
 prepare_try_times = 3
 first_page_try_times = 3
 
+begain_time = int(time.time())
+
+
+def print_run_time(begain_time, end_time):
+    run_time = end_time - begain_time
+    run_hour = '0'
+    if run_time > 3600:
+        run_hour = str(run_time // (60 * 60))
+    run_min = '0'
+    if run_time > 60:
+        run_min = str(run_time // 60)
+    run_sec = '0'
+    if run_time:
+        run_sec = str(run_time % 60)
+    logger.info('共运行%s小时%s分钟%s秒', run_hour, run_min, run_sec)
+    print('共运行{}小时{}分钟{}秒'.format(run_hour, run_min, run_sec))
+
 
 def prepare(host):
-    begain_time = int(time.time())
     ready_url = host + '/ershoufang/'
     ready_response = requests.get(
         ready_url, timeout=7
     )
-    try_times = 3
     if ready_response.status_code == 200:
         try:
             ready_soup = BeautifulSoup(
@@ -72,15 +87,10 @@ def prepare(host):
                     if begain_zone:
                         begain_zone = None
 
+            global begain_time
             bei_ke_db.delete_outdated_msg(begain_time)
             end_time = int(time.time())
-            run_time = end_time - begain_time
-            run_hour = '0'
-            if run_time > 3600:
-                run_hour = str(run_time // (60 * 60))
-            run_min = str(run_time // 60)
-            run_sec = str(run_time % 60)
-            logger.info('共运行%s小时%s分钟%s秒', run_hour, run_min, run_sec)
+            print_run_time(begain_time, end_time)
         except Exception:
             logger.exception('Ready解析失败')
     else:
@@ -379,6 +389,8 @@ def deal_house_detail(soup):
     sell_num = len(sell_list)
     if sell_num > 0:
         print('共 ' + str(sell_num) + ' 条数据')
+        global begain_time
+        print_run_time(begain_time, int(time.time()))
         detail_fail_pages = []
         for (i, li) in enumerate(sell_list):
             try:
@@ -406,7 +418,7 @@ def deal_house_detail(soup):
             times += 1
             new_detail_fail_pages = []
             for page_url in detail_fail_pages:
-                print('第' + times + '次重新访问详情页面：' + page_url + ' - ' +
+                print('第' + str(times) + '次重新访问详情页面：' + page_url + ' - ' +
                       str("{:.2f}".format((i + 1)/sell_num*100)) + ' %')
                 response_detail = requests.get(
                     page_url, headers=headers, timeout=7)
