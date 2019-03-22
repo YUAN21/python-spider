@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import bei_ke_db
 import json
 import logging
 import random
@@ -11,8 +12,11 @@ import requests
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 from requests.exceptions import RequestException, ReadTimeout
+import smtplib
+from email.mime.text import MIMEText
+from email.header import Header
+from email.mime.multipart import MIMEMultipart
 
-import bei_ke_db
 
 ua = UserAgent(use_cache_server=False)
 # 日志配置
@@ -21,6 +25,7 @@ stream_handler = logging.StreamHandler(sys.stdout)
 stream_handler.setLevel(level=logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s -|- %(levelname)s -|- %(message)s')
 handler.setFormatter(formatter)
+logging.getLogger().setLevel(logging.INFO)
 logger = logging.getLogger(__name__)
 logger.addHandler(handler)
 logger.addHandler(stream_handler)
@@ -62,7 +67,6 @@ def print_run_time(begain_time, end_time):
     if run_time:
         run_sec = str(run_time % 60)
     logger.info('共运行%s小时%s分钟%s秒', run_hour, run_min, run_sec)
-    print('共运行{}小时{}分钟{}秒'.format(run_hour, run_min, run_sec))
 
 
 def prepare(host):
@@ -91,6 +95,7 @@ def prepare(host):
             bei_ke_db.delete_outdated_msg(begain_time)
             end_time = int(time.time())
             print_run_time(begain_time, end_time)
+            post_email()
         except Exception:
             logger.exception('Ready解析失败')
     else:
@@ -441,11 +446,38 @@ def deal_house_detail(soup):
         print('当前页没有数据')
 
 
+def post_email():
+    sender = '1650192445@qq.com'
+    receivers = [sender]  # 接收邮件，可设置为你的QQ邮箱或者其他邮箱
+    # 发送文字  三个参数：第一个为文本内容，第二个 plain 设置文本格式，第三个 utf-8 设置编码
+    text = MIMEText('Python 邮件发送测试...', 'plain', 'utf-8')
+    # 发送附件
+    message = MIMEMultipart()
+    message['From'] = Header("虾爬子计划", 'utf-8')   # 发送者
+    message['To'] = Header("药药切克闹", 'utf-8')   # 接收者
+    subject = '贝壳_二手房信息'  # 标题
+    message['Subject'] = Header(subject, 'utf-8')
+    message.attach(text)
+    
+    # 构造附件
+    file = MIMEText(open('SQLite.db', 'rb').read(), 'base64', 'utf-8')
+    file["Content-Type"] = 'application/octet-stream'
+    # 这里的filename可以任意写
+    file["Content-Disposition"] = 'attachment; filename="SQLite.db"'
+    message.attach(file)
+    try:
+        smtpObj = smtplib.SMTP_SSL("smtp.qq.com", 465)  # 发件人邮箱中的SMTP服务器，端口是465
+        smtpObj.login(sender, 'tmmyznnhdiftbcbf')  # 括号中对应的是发件人邮箱账号、邮箱密码
+        smtpObj.sendmail(sender, receivers, message.as_string())
+    except smtplib.SMTPException:
+        logger.exception('无法发送邮件')
+
 def test():
     pass
 
 
 def main():
+    #post_email()
     prepare(host)
 
 
