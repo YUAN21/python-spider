@@ -10,15 +10,19 @@ import sys
 
 import requests
 from bs4 import BeautifulSoup
-from fake_useragent import UserAgent
+#from fake_useragent import UserAgent
 from requests.exceptions import RequestException, ReadTimeout
 import smtplib
 from email.mime.text import MIMEText
 from email.header import Header
 from email.mime.multipart import MIMEMultipart
 
+requests.packages.urllib3.disable_warnings()
+requests.adapters.DEFAULT_RETRIES = 3
+s = requests.session()       
+s.keep_alive = False
 
-ua = UserAgent(use_cache_server=False)
+#ua = UserAgent(use_cache_server=False)
 # 日志配置
 handler = logging.FileHandler(filename='bei_ke_used.log', encoding='utf-8')
 stream_handler = logging.StreamHandler(sys.stdout)
@@ -72,7 +76,7 @@ def print_run_time(begain_time, end_time):
 def prepare(host):
     ready_url = host + '/ershoufang/'
     ready_response = requests.get(
-        ready_url, timeout=7
+        ready_url, timeout=7, verify=False
     )
     if ready_response.status_code == 200:
         try:
@@ -116,17 +120,13 @@ def print_schedule(curr_value, total_value):
 
 def deal_house_list(host, zone_name, zone_href):
 
-    headers = {
-        'User-Agent':  ua.random,
-        'Accept-Encoding': 'gzip, deflate, sdch',
-        'Accept-Language': 'zh-CN,zh;q=0.8'
-    }
+    headers = {'Connection':'close'}
     try:
         global first_page_try_times
         url = host + zone_href
         # 请求各区第一页列表
         response = requests.get(
-            url, headers=headers, timeout=7)
+            url, headers=headers, timeout=7, verify=False)
         if response.status_code == 200:
             first_page_try_times = 3
             print(zone_name + '列表首页请求成功')
@@ -155,11 +155,11 @@ def deal_house_list(host, zone_name, zone_href):
                     if not begain_page_num or page_num == begain_page_num:
                         print(zone_name + '：共' + str(max_page) + ' 页')
                         print_schedule(page_num, max_page)
-                        time.sleep(random.randint(3, 7))
+                        time.sleep(random.randint(3,4))
                         url_other_page = host + zone_href + \
                             '/' + 'pg' + str(page_num) + '/'
                         response_other_page = requests.get(
-                            url_other_page, headers=headers, timeout=7)
+                            url_other_page, headers=headers, timeout=7, verify=False)
                         if response_other_page.status_code == 200:
                             soup_other_page = BeautifulSoup(
                                 response_other_page.text, 'html5lib')
@@ -176,7 +176,7 @@ def deal_house_list(host, zone_name, zone_href):
                     new_fail_pages = []
                     for page_url in fail_pages:
                         response_other_page = requests.get(
-                            page_url, headers=headers, timeout=7)
+                            page_url, headers=headers, timeout=7, verify=False)
                         if response_other_page.status_code == 200:
                             soup_other_page = BeautifulSoup(
                                 response_other_page.text, 'html5lib')
@@ -385,11 +385,7 @@ def deal_detail_pages(soup_detail, detail_href):
 
 
 def deal_house_detail(soup):
-    headers = {
-        'User-Agent':  ua.random,
-        'Accept-Encoding': 'gzip, deflate, sdch',
-        'Accept-Language': 'zh-CN,zh;q=0.8'
-    }
+    headers = {'Connection':'close'}
     sell_list = soup.select('li.clear')
     sell_num = len(sell_list)
     if sell_num > 0:
@@ -404,7 +400,7 @@ def deal_house_detail(soup):
                 print('访问详情页面：' + detail_href + ' - ' +
                       str("{:.2f}".format((i + 1)/sell_num*100)) + ' %')
                 response_detail = requests.get(
-                    detail_href, headers=headers, timeout=7)
+                    detail_href, headers=headers, timeout=7, verify=False)
                 if response_detail.status_code == 200:
                     soup_detail = BeautifulSoup(
                         response_detail.text, 'html5lib')
@@ -426,7 +422,7 @@ def deal_house_detail(soup):
                 print('第' + str(times) + '次重新访问详情页面：' + page_url + ' - ' +
                       str("{:.2f}".format((i + 1)/sell_num*100)) + ' %')
                 response_detail = requests.get(
-                    page_url, headers=headers, timeout=7)
+                    page_url, headers=headers, timeout=7, verify=False)
                 if response_detail.status_code == 200:
                     soup_detail = BeautifulSoup(
                         response_detail.text, 'html5lib')
