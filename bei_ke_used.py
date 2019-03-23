@@ -446,7 +446,7 @@ def post_email():
     sender = '1650192445@qq.com'
     receivers = [sender]  # 接收邮件，可设置为你的QQ邮箱或者其他邮箱
     # 发送文字  三个参数：第一个为文本内容，第二个 plain 设置文本格式，第三个 utf-8 设置编码
-    text = MIMEText('Python 邮件发送测试...', 'plain', 'utf-8')
+    text = MIMEText('。。。。。', 'plain', 'utf-8')
     # 发送附件
     message = MIMEMultipart()
     message['From'] = Header("虾爬子计划", 'utf-8')   # 发送者
